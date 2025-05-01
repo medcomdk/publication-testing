@@ -54,7 +54,7 @@ jobs:
         id: token
         uses: actions/create-github-app-token@v2
         with:
-          app-id: 1237461
+          app-id: "1237461"
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
           repositories: "${{ env.WEB_REPO }},${{ env.REGISTRY_REPO }}"
@@ -68,4 +68,4 @@ jobs:
           registry-repo: ${{ github.repository_owner }}/${{ env.REGISTRY_REPO }}
           web-repo: ${{ github.repository_owner }}/${{ env.WEB_REPO }}
           web-source: ${{ env.WEB_APP_LOCATION }}
-          web-commit: false
+          web-commit: "false"
