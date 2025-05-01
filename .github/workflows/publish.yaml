@@ -55,7 +55,7 @@ jobs:
         uses: actions/create-github-app-token@v2
         with:
           app-id: "1237461"
-          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          private-key: ${{ secrets.PUBLISHER_APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
           repositories: "${{ env.WEB_REPO }},${{ env.REGISTRY_REPO }}"
 
