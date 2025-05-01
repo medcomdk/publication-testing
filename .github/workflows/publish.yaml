@@ -49,13 +49,10 @@ jobs:
           cat ig/sushi-config.yaml
           echo -n "\n\n======================== publication-request.json ========================\n"
           cat ig/publication-request.json
-          echo "Private key: ${{ secrets.PUBLISHER_APP_PRIVATE_KEY }}"
-          echo ${{ github.repository_owner }}
-          
 
       - name: Generate app token
         id: token
-        uses: actions/create-github-app-token@v2
+        uses: actions/create-github-app-token@v1
         with:
           app-id: "1237461"
           private-key: ${{ secrets.PUBLISHER_APP_PRIVATE_KEY }}
