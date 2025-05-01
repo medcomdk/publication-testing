@@ -1,1 +1,0 @@
-# dk-medcom-document

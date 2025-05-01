@@ -3,31 +3,33 @@
 # │  used properties are included. For a list of all supported properties and their functions,     │
 # │  see: https://fshschool.org/docs/sushi/configuration/.                                         │
 # ╰────────────────────────────────────────────────────────────────────────────────────────────────╯
-id: medcom.fhir.dk.document
-canonical: http://medcomfhir.dk/ig/document
-name: MedComDocument
-title: DK MedCom Document
-description: The DK MedCom Document IG
-status: active # draft | active | retired | unknown
-version: 1.0.0
+id: fhir.example
+canonical: http://example.org
+name: ExampleIG
+# title: Example Title
+# description: Example Implementation Guide for getting started with SUSHI
+status: draft # draft | active | retired | unknown
+version: 0.1.0
 fhirVersion: 4.0.1 # https://www.hl7.org/fhir/valueset-FHIR-version.html
-copyrightYear: 2024+
-releaseLabel: release # ci-build | draft | qa-preview | ballot | trial-use | release | update | normative+trial-use
+copyrightYear: 2025+
+releaseLabel: draft
 # license: CC0-1.0 # https://www.hl7.org/fhir/valueset-spdx-license.html
 # jurisdiction: urn:iso:std:iso:3166#US "United States of America" # https://www.hl7.org/fhir/valueset-jurisdiction.html
 publisher:
-  name: MedCom
-  url: http://www.medcom.dk
+  name: Example Publisher
+  url: http://example.org/example-publisher
   # email: test@example.org
 
 # The dependencies property corresponds to IG.dependsOn. The key is the
 # package id and the value is the version (or dev/current). For advanced
 # use cases, the value can be an object with keys for id, uri, and version.
 #
-dependencies:
-  medcom.fhir.dk.xdsmetadata: 1.0.0
-  medcom.fhir.dk.core: 2.4.0
-  hl7.fhir.dk.core: 3.2.0
+# dependencies:
+#   hl7.fhir.us.core: 3.1.0
+#   hl7.fhir.us.mcode:
+#     id: mcode
+#     uri: http://hl7.org/fhir/us/mcode/ImplementationGuide/hl7.fhir.us.mcode
+#     version: 1.0.0
 #
 #
 # The pages property corresponds to IG.definition.page. SUSHI can
@@ -73,12 +75,8 @@ dependencies:
 # │ property below.                                                                                │
 # ╰────────────────────────────────────────────────────────────────────────────────────────────────╯
 menu:
-  Table of Contents: toc.html
   Home: index.html
-  Profiles: profiles.html
-  Extensions: extensions.html
   Artifacts: artifacts.html
-  Downloads: downloads.html
 
 # ╭───────────────────────────Less Common Implementation Guide Properties──────────────────────────╮
 # │  Uncomment the properties below to configure additional properties on the ImplementationGuide  │
