@@ -62,7 +62,7 @@ jobs:
       - name: Show files
         shell: bash
         run: |
-          echo | ls /ig
+          echo | ls ig/
 
       - name: Show files
         shell: bash
