@@ -50,22 +50,22 @@ jobs:
           echo -n "\n\n======================== publication-request.json ========================\n"
           cat ig/publication-request.json
 
-      # - name: Generate app token
-      #   id: token
-      #   uses: actions/create-github-app-token@v1
-      #   with:
-      #     app-id: ${{ vars.APP_ID }}
-      #     private-key: ${{ secrets.APP_PRIVATE_KEY }}
-      #     owner: ${{ github.repository_owner }}
-      #     repositories: "${{ env.WEB_REPO }},${{ env.REGISTRY_REPO }}"
+      - name: Generate app token
+        id: token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: 1237461
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: "${{ env.WEB_REPO }},${{ env.REGISTRY_REPO }}"
 
-      # - name: Publish the implementation guide
-      #   uses: trifork/ig-publisher/.github/actions/ig-publish@v1
-      #   # uses: ../../trifork/ig-publisher/.github/actions/ig-publish # Test local action
-      #   with:
-      #     app-token: ${{ steps.token.outputs.token }}
-      #     app-author-name: ${{ env.APP_AUTHOR_NAME }}
-      #     app-author-email: ${{ env.APP_AUTHOR_EMAIL }}
-      #     registry-repo: ${{ github.repository_owner }}/${{ env.REGISTRY_REPO }}
-      #     web-repo: ${{ github.repository_owner }}/${{ env.WEB_REPO }}
-      #     web-source: ${{ env.WEB_APP_LOCATION }}
+      - name: Publish the implementation guide
+        uses: trifork/ig-publisher/.github/actions/ig-publish@v1
+        with:
+          app-token: ${{ steps.token.outputs.token }}
+          app-author-name: ${{ env.APP_AUTHOR_NAME }}
+          app-author-email: ${{ env.APP_AUTHOR_EMAIL }}
+          registry-repo: ${{ github.repository_owner }}/${{ env.REGISTRY_REPO }}
+          web-repo: ${{ github.repository_owner }}/${{ env.WEB_REPO }}
+          web-source: ${{ env.WEB_APP_LOCATION }}
+          web-commit: false
