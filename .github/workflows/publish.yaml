@@ -59,15 +59,10 @@ jobs:
           owner: ${{ github.repository_owner }}
           repositories: "${{ env.WEB_REPO }},${{ env.REGISTRY_REPO }}"
 
-      - name: Show files
+      - name: Transpile
         shell: bash
-        run: |
-          echo | ls ig/
-
-      - name: Show files
-        shell: bash
-        run: |
-          echo | pwd
+        working-directory: ./ig
+        run: java -jar /input-cache/publisher.jar .
 
       - name: Publish the implementation guide
         uses: trifork/ig-publisher/.github/actions/ig-publish@v1
