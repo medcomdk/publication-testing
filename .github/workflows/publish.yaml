@@ -6,7 +6,7 @@ on:
       - 'v.[0-9]+.[0-9]+.[0-9]+'   # Only runs on semantic tags (v.1.2.3)
 
 env:
-  WEB_APP_LOCATION: "ig/documentTest/"
+  WEB_APP_LOCATION: "ig/"
   WEB_REPO: "medcomfhir-website"
   REGISTRY_REPO: "ig-registry"
   APP_AUTHOR_NAME: ${{ github.triggering_actor }}
@@ -52,7 +52,7 @@ jobs:
 
       - name: Generate app token
         id: token
-        uses: actions/create-github-app-token@v2
+        uses: actions/create-github-app-token@v1
         with:
           app-id: "1237461"
           private-key: ${{ secrets.PUBLISHER_APP_PRIVATE_KEY }}
