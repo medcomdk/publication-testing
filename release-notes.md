@@ -1,1 +1,1 @@
-TODO TODO
+Initial commit of DK MedCom Document IG

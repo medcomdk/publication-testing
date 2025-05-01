@@ -1,0 +1,12 @@
+@startuml
+actor "Content Provider" as CS
+participant "Document Administrator" as DS
+participant "Document Repository" as DR
+participant "Document Registry" as DReg
+
+CS -> DS: Trigger to replace existing document
+DS -> DS: Prepare updated document and metadata
+DS -> DR: Send update request (ITI-57)
+DR -> DR: Process request
+DR -> DS: Error response (ITI-57)
+@enduml

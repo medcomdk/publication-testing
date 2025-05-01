@@ -62,12 +62,13 @@ jobs:
       - name: Show files
         shell: bash
         run: |
-          echo | ls ig/
+          echo | ls ../.
 
       - name: Show files
         shell: bash
-        run: |
-          echo | pwd
+        working-directory: ./ig
+        run: java -jar /input-cache/publisher.jar .
+
 
       - name: Publish the implementation guide
         uses: trifork/ig-publisher/.github/actions/ig-publish@v1

@@ -1,14 +1,15 @@
 {
-    "package-id": "fhir.example",
-    "version": "0.1.0",
-    "path": "http://example.org/ig/fhir.example/0.1.0",
-    "status": "draft",
+    "package-id": "medcom.fhir.dk.document",
+    "version": "1.0.0",
+    "path": "http://medcomfhir.dk/ig/document/1.0.0",
+    "status": "release",
     "sequence": "Release",
     "first" : true,
     "ci-build" : "https://build.fhir.org/ig/medcomdk/dk-medcom-document",
     "milestone" : true,
-    "title": "DK FHIR Example MedCom",
-    "category": "MedCom Draft",
-    "introduction": "TODO",
+    "title": "DK MedCom Document",
+    "category": "MedCom Document",
+    "introduction": "The MedCom Document Implementation Guide includes profiles developed to be used in MedCom documents.",
     "descmd": "@release-notes.md"
 }
+  

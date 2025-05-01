@@ -1,0 +1,11 @@
+@startuml
+actor "Document Administrator" as DA
+participant "Document Source" as DS
+participant "Document Registry" as DReg
+
+DA -> DS: Trigger to deprecate existing document
+DS -> DReg: Send request to deprecate a document
+DReg -> DReg: Process deprecation request
+DReg -> DReg: Update availabilityStatus to 'deprecated' for document
+DReg -> DS: Return successful response
+@enduml
