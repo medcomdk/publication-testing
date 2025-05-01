@@ -3,8 +3,8 @@
 # │  used properties are included. For a list of all supported properties and their functions,     │
 # │  see: https://fshschool.org/docs/sushi/configuration/.                                         │
 # ╰────────────────────────────────────────────────────────────────────────────────────────────────╯
-id: test.medcom.fhir.dk.document
-canonical: http://medcomfhir.dk/ig/testdocument
+id: medcom.fhir.dk.document
+canonical: http://medcomfhir.dk/ig/document
 name: MedComDocument
 title: DK MedCom Document
 description: The DK MedCom Document IG
