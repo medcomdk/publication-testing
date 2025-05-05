@@ -86,20 +86,20 @@ jobs:
           repository: ${{ github.repository_owner }}/${{ env.WEB_REPO }}
           token: ${{ steps.token.outputs.token }}
           path: ${{ env.WEB_REPO_CONTAINER_PATH }}
-          
-          fetch-depth: 0
-          sparse-checkout-cone-mode: false
-          sparse-checkout: |
-            ig/index.md
-            ig/dark-medcom-logo.png
-            ig/package-feed.xml
-            ig/package-registry.json
-            ig/publication-feed.xml
-            ig/publish-counter.json
-            ig/publish-setup.json
-            ig/publish.ini
-            ig/${{ env.IG_NAME }}/**
-            ig/templates/**
+
+          # fetch-depth: 0
+          # sparse-checkout-cone-mode: false
+          # sparse-checkout: |
+          #   ig/index.md
+          #   ig/dark-medcom-logo.png
+          #   ig/package-feed.xml
+          #   ig/package-registry.json
+          #   ig/publication-feed.xml
+          #   ig/publish-counter.json
+          #   ig/publish-setup.json
+          #   ig/publish.ini
+          #   ig/${{ env.IG_NAME }}/**
+          #   ig/templates/**
     
       - name: Fetch the IG registry repo
         uses: actions/checkout@v4
