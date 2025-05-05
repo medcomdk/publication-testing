@@ -103,12 +103,12 @@ jobs:
             ig/${{ env.IG_NAME }}/**
             ig/templates/**
     
-      # - name: Fetch the IG registry repo
-      #   uses: actions/checkout@v4
-      #   with:
-      #     repository: ${{ github.repository_owner }}/${{ env.REGISTRY_REPO }}
-      #     token: ${{ steps.token.outputs.token }}
-      #     path: ${{ env.REGISTRY_REPO_CONTAINER_PATH }}
+      - name: Fetch the IG registry repo
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/${{ env.REGISTRY_REPO }}
+          token: ${{ steps.token.outputs.token }}
+          path: ${{ env.REGISTRY_REPO_CONTAINER_PATH }}
 
       # - name: Fetch the IG history template repo
       #   uses: actions/checkout@v4
