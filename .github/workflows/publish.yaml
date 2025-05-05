@@ -64,13 +64,6 @@ jobs:
           cat ${{ env.IG_CONTAINER_PATH }}/sushi-config.yaml
           echo -n "\n\n======================== publication-request.json ========================\n"
           cat ${{ env.IG_CONTAINER_PATH }}/publication-request.json
-          echo ${{ vars.FHIR_PUBLICATION_BOT_APP_ID }}
-          len=$(echo -n "${{ secrets.PUBLISHER_APP_PRIVATE_KEY }}" | wc -c)
-          echo "PUBLISHER_APP_PRIVATE_KEY is $len characters long"
-          # Get the first character
-          first_char=$(echo -n "${{ secrets.PUBLISHER_APP_PRIVATE_KEY }}" | head -c1)
-          # Print it – this single character will NOT be redacted
-          echo "First character of secret is: '$first_char'"
 
       # TODO Uncomment
       # - name: Transpile to prepare for publication
@@ -80,7 +73,7 @@ jobs:
 
       - name: Generate app token
         id: token
-        uses: actions/create-github-app-token@v1
+        uses: actions/create-github-app-token@v2
         with:
           app-id: ${{ vars.FHIR_PUBLICATION_BOT_APP_ID }} 
           private-key: ${{ secrets.PUBLISHER_APP_PRIVATE_KEY }}
@@ -93,6 +86,9 @@ jobs:
           repository: ${{ github.repository_owner }}/${{ env.WEB_REPO }}
           token: ${{ steps.token.outputs.token }}
           path: ${{ env.WEB_REPO_CONTAINER_PATH }}
+          
+          fetch-depth: 0
+          sparse-checkout-cone-mode: false
           sparse-checkout: |
             ig/index.md
             ig/dark-medcom-logo.png
