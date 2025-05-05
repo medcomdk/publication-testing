@@ -34,7 +34,7 @@ jobs:
 
       - name: Extract IG name from canonical URL
         run: |
-          url=$(grep '^canonical:' sushi-config.yaml \
+          url=$(grep '^canonical:' ${{ env.IG_CONTAINER_PATH }}/sushi-config.yaml \
                 | sed -e 's/^canonical:[[:space:]]*//')
           IG_NAME=${url##*/}
           echo "IG_NAME=$IG_NAME" >> $GITHUB_ENV
