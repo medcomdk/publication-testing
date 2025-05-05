@@ -132,18 +132,18 @@ jobs:
         run: |
           rm --recursive --force --verbose ${{ env.WEB_REPO_CONTAINER_PATH }}/ig/ig-build-zips
 
-      - name: Update IG registry
-        shell: bash
-        run: |
-          export DESCRIPTION=$(yq -r .description ${{ env.IG_CONTAINER_PATH }}/sushi-config.yaml)
-          export AUTHORITY=$(yq -r .publisher.name ${{ env.IG_CONTAINER_PATH }}/sushi-config.yaml)
-          echo $DESCRIPTION
-          echo $AUTHORITY
-          echo "$(jq '
-            .guides[-1].description = env.DESCRIPTION |
-            .guides[-1].authority = env.AUTHORITY |
-            .guides[-1].country = "dk"
-          ' ${{ env.REGISTRY_REPO_CONTAINER_PATH }}/fhir-ig-list.json)" > ${{ env.REGISTRY_REPO_CONTAINER_PATH }}/fhir-ig-list.json
+      # - name: Update IG registry
+      #   shell: bash
+      #   run: |
+      #     export DESCRIPTION=$(yq -r .description ${{ env.IG_CONTAINER_PATH }}/sushi-config.yaml)
+      #     export AUTHORITY=$(yq -r .publisher.name ${{ env.IG_CONTAINER_PATH }}/sushi-config.yaml)
+      #     echo $DESCRIPTION
+      #     echo $AUTHORITY
+      #     echo "$(jq '
+      #       .guides[-1].description = env.DESCRIPTION |
+      #       .guides[-1].authority = env.AUTHORITY |
+      #       .guides[-1].country = "dk"
+      #     ' ${{ env.REGISTRY_REPO_CONTAINER_PATH }}/fhir-ig-list.json)" > ${{ env.REGISTRY_REPO_CONTAINER_PATH }}/fhir-ig-list.json
 
       - name: Show new publication IG publication registration entry
         shell: bash
