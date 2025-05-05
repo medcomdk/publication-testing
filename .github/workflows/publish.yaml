@@ -37,7 +37,7 @@ jobs:
           url=$(grep '^canonical:' sushi-config.yaml \
                 | sed -e 's/^canonical:[[:space:]]*//')
           IG_NAME=${url##*/}
-          echo "IG_NAME=$IG_NAME"
+          echo "IG_NAME=$IG_NAME" >> $GITHUB_ENV
 
       - name: Set Sushi config release YAML properties
         uses: fjogeleit/yaml-update-action@v0.16.0
@@ -95,7 +95,7 @@ jobs:
             ig/publish-counter.json
             ig/publish-setup.json
             ig/publish.ini
-            ig/${{ IG_NAME }}/**
+            ig/${{ env.IG_NAME }}/**
             ig/templates/**
     
       - name: Fetch the IG registry repo
