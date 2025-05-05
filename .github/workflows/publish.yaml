@@ -32,38 +32,38 @@ jobs:
         with:
           path: ${{ env.IG_CONTAINER_PATH }}
 
-      # - name: Extract IG name from canonical URL
-      #   run: |
-      #     url=$(grep '^canonical:' ${{ env.IG_CONTAINER_PATH }}/sushi-config.yaml \
-      #           | sed -e 's/^canonical:[[:space:]]*//')
-      #     IG_NAME=${url##*/}
-      #     echo "IG_NAME=$IG_NAME" >> $GITHUB_ENV
+      - name: Extract IG name from canonical URL
+        run: |
+          url=$(grep '^canonical:' ${{ env.IG_CONTAINER_PATH }}/sushi-config.yaml \
+                | sed -e 's/^canonical:[[:space:]]*//')
+          IG_NAME=${url##*/}
+          echo "IG_NAME=$IG_NAME" >> $GITHUB_ENV
 
-      # - name: Set Sushi config release YAML properties
-      #   uses: fjogeleit/yaml-update-action@v0.16.0
-      #   with:
-      #     valueFile: ${{ env.IG_CONTAINER_PATH }}/sushi-config.yaml
-      #     commitChange: false
-      #     createPR: false
-      #     changes: |
-      #       {
-      #         "version": "${{ env.RELEASE_VERSION }}",
-      #         "releaseLabel": "release"
-      #       }
+      - name: Set Sushi config release YAML properties
+        uses: fjogeleit/yaml-update-action@v0.16.0
+        with:
+          valueFile: ${{ env.IG_CONTAINER_PATH }}/sushi-config.yaml
+          commitChange: false
+          createPR: false
+          changes: |
+            {
+              "version": "${{ env.RELEASE_VERSION }}",
+              "releaseLabel": "release"
+            }
 
-      # - name: Update publication-request.json with the release version
-      #   run: |
-      #     echo "$(jq '
-      #       .version = env.RELEASE_VERSION |
-      #       .path |= sub("/[0-9\\.]+$"; "/" + env.RELEASE_VERSION)
-      #     ' ${{ env.IG_CONTAINER_PATH }}/publication-request.json)" > ${{ env.IG_CONTAINER_PATH }}/publication-request.json
+      - name: Update publication-request.json with the release version
+        run: |
+          echo "$(jq '
+            .version = env.RELEASE_VERSION |
+            .path |= sub("/[0-9\\.]+$"; "/" + env.RELEASE_VERSION)
+          ' ${{ env.IG_CONTAINER_PATH }}/publication-request.json)" > ${{ env.IG_CONTAINER_PATH }}/publication-request.json
 
-      # - name: Print edited config files
-      #   run: |
-      #     echo "======================== sushi-config.yaml        ========================"
-      #     cat ${{ env.IG_CONTAINER_PATH }}/sushi-config.yaml
-      #     echo -n "\n\n======================== publication-request.json ========================\n"
-      #     cat ${{ env.IG_CONTAINER_PATH }}/publication-request.json
+      - name: Print edited config files
+        run: |
+          echo "======================== sushi-config.yaml        ========================"
+          cat ${{ env.IG_CONTAINER_PATH }}/sushi-config.yaml
+          echo -n "\n\n======================== publication-request.json ========================\n"
+          cat ${{ env.IG_CONTAINER_PATH }}/publication-request.json
 
       # - name: Install the latest SUSHI
       #   run: npm install -g fsh-sushi
@@ -157,10 +157,9 @@ jobs:
           git config --global user.email "${{ env.APP_AUTHOR_EMAIL }}"
 
       - name: Show Web repo git status files
-        working-directory: ${{ env.WEB_REPO_CONTAINER_PATH }}
         shell: bash
         run: |
-          touch test.txt
+          touch ${{ env.WEB_REPO_CONTAINER_PATH }}/ig/${{ env.IG_NAME }}/test.txt
           git status
 
       # - name: Commit changes in website repo
