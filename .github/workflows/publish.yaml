@@ -2,13 +2,19 @@ name: MedCom document publish job
 
 on:
   push:
+  # TODO: Uncomment this tags
+  # TODO: Remove the Oliver publication bot
     # tags:
       # - 'v.[0-9]+.[0-9]+.[0-9]+'   # Only runs on semantic tags (v.1.2.3)
 
 env:
-  WEB_APP_LOCATION: "ig/"
+  IG_CONTAINER_PATH: "ig"
   WEB_REPO: "medcomfhir-website"
+  WEB_REPO_CONTAINER_PATH: "igwebsite"
   REGISTRY_REPO: "ig-registry"
+  REGISTRY_REPO_CONTAINER_PATH: "igregistry"
+  IG_HISTORY_REPO: "HL7/fhir-ig-history-template"
+  IG_HISTORY_TEMPLATE_CONTAINER_PATH: "ighistorytemplate"
   APP_AUTHOR_NAME: ${{ github.triggering_actor }}
   APP_AUTHOR_EMAIL: "fhir@medcom.dk"
   RELEASE_VERSION: ${{ github.ref_name }}
@@ -20,14 +26,23 @@ jobs:
     container: ghcr.io/trifork/ig-publisher:1.8.25
 
     steps:
-      - uses: actions/checkout@v4
+      # ────── 🗂️ Prepare Release Files 🗂️ ──────
+      - name: Checkout IG Source
+        uses: actions/checkout@v4
         with:
-          path: ig
+          path: ${{ env.IG_CONTAINER_PATH }}
+
+      - name: Extract IG name from canonical URL
+        run: |
+          url=$(grep '^canonical:' sushi-config.yaml \
+                | sed -e 's/^canonical:[[:space:]]*//')
+          IG_NAME=${url##*/}
+          echo "IG_NAME=$IG_NAME"
 
       - name: Set Sushi config release YAML properties
         uses: fjogeleit/yaml-update-action@v0.16.0
         with:
-          valueFile: ig/sushi-config.yaml
+          valueFile: ${{ env.IG_CONTAINER_PATH }}/sushi-config.yaml
           commitChange: false
           createPR: false
           changes: |
@@ -41,36 +56,98 @@ jobs:
           echo "$(jq '
             .version = env.RELEASE_VERSION |
             .path |= sub("/[0-9\\.]+$"; "/" + env.RELEASE_VERSION)
-          ' ig/publication-request.json)" > ig/publication-request.json
+          ' ${{ env.IG_CONTAINER_PATH }}/publication-request.json)" > ${{ env.IG_CONTAINER_PATH }}/publication-request.json
 
       - name: Print edited config files
+        if: env.DEBUG == 'true'
         run: |
           echo "======================== sushi-config.yaml        ========================"
-          cat ig/sushi-config.yaml
+          cat ${{ env.IG_CONTAINER_PATH }}/sushi-config.yaml
           echo -n "\n\n======================== publication-request.json ========================\n"
-          cat ig/publication-request.json
+          cat ${{ env.IG_CONTAINER_PATH }}/publication-request.json
+
+      - name: Transpile to prepare for publication
+        shell: bash
+        working-directory: ${{ env.IG_CONTAINER_PATH }}
+        run: java -jar /input-cache/publisher.jar .
 
       - name: Generate app token
         id: token
         uses: actions/create-github-app-token@v1
         with:
-          app-id: "1237461"
+          app-id: ${{ vars.FHIR_PUBLICATION_BOT_APP_ID }} 
           private-key: ${{ secrets.PUBLISHER_APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
           repositories: "${{ env.WEB_REPO }},${{ env.REGISTRY_REPO }}"
 
-      - name: Transpile
-        shell: bash
-        working-directory: ./ig
-        run: java -jar /input-cache/publisher.jar .
-
-      - name: Publish the implementation guide
-        uses: trifork/ig-publisher/.github/actions/ig-publish@v1
+      - name: Fetch the IG website repo
+        uses: actions/checkout@v4
         with:
-          app-token: ${{ steps.token.outputs.token }}
-          app-author-name: ${{ env.APP_AUTHOR_NAME }}
-          app-author-email: ${{ env.APP_AUTHOR_EMAIL }}
-          registry-repo: ${{ github.repository_owner }}/${{ env.REGISTRY_REPO }}
-          web-repo: ${{ github.repository_owner }}/${{ env.WEB_REPO }}
-          web-source: ${{ env.WEB_APP_LOCATION }}
-          web-commit: "false"
+          repository: ${{ github.repository_owner }}/${{ env.WEB_REPO }}
+          token: ${{ steps.token.outputs.token }}
+          path: ${{ env.WEB_REPO_CONTAINER_PATH }}
+          sparse-checkout: |
+            ig/index.md
+            ig/dark-medcom-logo.png
+            ig/package-feed.xml
+            ig/package-registry.json
+            ig/publication-feed.xml
+            ig/publish-counter.json
+            ig/publish-setup.json
+            ig/publish.ini
+            ig/${{ IG_NAME }}/**
+            ig/templates/**
+    
+      - name: Fetch the IG registry repo
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/${{ env.REGISTRY_REPO }}
+          token: ${{ steps.token.outputs.token }}
+          path: ${{ env.REGISTRY_REPO_CONTAINER_PATH }}
+
+      - name: Fetch the IG history template repo
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.IG_HISTORY_REPO }}
+          token: ${{ steps.token.outputs.token }}
+          path: ${{ env.IG_HISTORY_TEMPLATE_CONTAINER_PATH }}
+
+      - name: Run the IG Publish process
+        shell: bash
+        run: >-
+          java -jar /input-cache/publisher.jar -go-publish
+          -source ${{ env.IG_CONTAINER_PATH }}
+          -web ${{ env.WEB_REPO_CONTAINER_PATH }}/ig
+          -history ${{ env.IG_HISTORY_TEMPLATE_CONTAINER_PATH }}
+          -registry ${{ env.REGISTRY_REPO_CONTAINER_PATH }}/fhir-ig-list.json 
+          -templates ${{ env.WEB_REPO_CONTAINER_PATH }}/ig/templates
+
+      - name: Remove unnecessary files
+        shell: bash
+        run: |
+          rm --recursive --force --verbose ${{ env.WEB_REPO_CONTAINER_PATH }}/ig/ig-build-zips
+
+      - name: Update IG registry
+        shell: bash
+        run: |
+          export DESCRIPTION=$(yq -r .description ${{ env.IG_CONTAINER_PATH }}/sushi-config.yaml)
+          export AUTHORITY=$(yq -r .publisher.name ${{ env.IG_CONTAINER_PATH }}/sushi-config.yaml)
+          echo $DESCRIPTION
+          echo $AUTHORITY
+          echo "$(jq '
+            .guides[-1].description = env.DESCRIPTION |
+            .guides[-1].authority = env.AUTHORITY |
+            .guides[-1].country = "dk"
+          ' ${{ env.REGISTRY_REPO_CONTAINER_PATH }}/fhir-ig-list.json)" > ${{ env.REGISTRY_REPO_CONTAINER_PATH }}/fhir-ig-list.json
+
+      - name: Show new publication IG publication registration entry
+        shell: bash
+        run: |
+          echo "$(jq '.guides[-1]' ${{ env.REGISTRY_REPO_CONTAINER_PATH }}/fhir-ig-list.json)"
+
+      - name: Show Web repo git status files
+        shell: bash
+        run: |
+          git -C ${{ env.WEB_REPO_CONTAINER_PATH }} status
+
+      # TODO: Commit the changes

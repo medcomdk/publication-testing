@@ -1,14 +1,14 @@
 {
-    "package-id": "fhir.example",
+    "package-id": "medcom.fhir.dk.fhirexample",
     "version": "0.1.0",
-    "path": "http://example.org/ig/fhir.example/0.1.0",
+    "path": "http://medcomfhir.dk/ig/fhirexample/0.1.0",
     "status": "draft",
     "sequence": "Release",
     "first" : true,
-    "ci-build" : "https://build.fhir.org/ig/medcomdk/dk-medcom-document",
     "milestone" : true,
     "title": "DK FHIR Example MedCom",
     "category": "MedCom Draft",
     "introduction": "TODO",
-    "descmd": "@release-notes.md"
+    "descmd": "@release-notes.md",
+    "ci-build" : "https://build.fhir.org/ig/medcomdk/dk-medcom-fhirexample"
 }
