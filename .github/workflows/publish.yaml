@@ -65,13 +65,13 @@ jobs:
           echo -n "\n\n======================== publication-request.json ========================\n"
           cat ${{ env.IG_CONTAINER_PATH }}/publication-request.json
 
-      # - name: Install the latest SUSHI
-      #   run: npm install -g fsh-sushi
+      - name: Install the latest SUSHI
+        run: npm install -g fsh-sushi
 
-      # - name: Transpile to prepare for publication
-      #   shell: bash
-      #   working-directory: ${{ env.IG_CONTAINER_PATH }}
-      #   run: java -jar /input-cache/publisher.jar .
+      - name: Transpile to prepare for publication
+        shell: bash
+        working-directory: ${{ env.IG_CONTAINER_PATH }}
+        run: java -jar /input-cache/publisher.jar .
 
       - name: Generate app token
         id: token
@@ -110,45 +110,45 @@ jobs:
           token: ${{ steps.token.outputs.token }}
           path: ${{ env.REGISTRY_REPO_CONTAINER_PATH }}
 
-      # - name: Fetch the IG history template repo
-      #   uses: actions/checkout@v4
-      #   with:
-      #     repository: ${{ env.IG_HISTORY_REPO }}
-      #     token: ${{ steps.token.outputs.token }}
-      #     path: ${{ env.IG_HISTORY_TEMPLATE_CONTAINER_PATH }}
+      - name: Fetch the IG history template repo
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.IG_HISTORY_REPO }}
+          token: ${{ steps.token.outputs.token }}
+          path: ${{ env.IG_HISTORY_TEMPLATE_CONTAINER_PATH }}
 
-      # - name: Run the IG Publish process
-      #   shell: bash
-      #   run: >-
-      #     java -jar /input-cache/publisher.jar -go-publish
-      #     -source ${{ env.IG_CONTAINER_PATH }}
-      #     -web ${{ env.WEB_REPO_CONTAINER_PATH }}/ig
-      #     -history ${{ env.IG_HISTORY_TEMPLATE_CONTAINER_PATH }}
-      #     -registry ${{ env.REGISTRY_REPO_CONTAINER_PATH }}/fhir-ig-list.json 
-      #     -templates ${{ env.WEB_REPO_CONTAINER_PATH }}/ig/templates
+      - name: Run the IG Publish process
+        shell: bash
+        run: >-
+          java -jar /input-cache/publisher.jar -go-publish
+          -source ${{ env.IG_CONTAINER_PATH }}
+          -web ${{ env.WEB_REPO_CONTAINER_PATH }}/ig
+          -history ${{ env.IG_HISTORY_TEMPLATE_CONTAINER_PATH }}
+          -registry ${{ env.REGISTRY_REPO_CONTAINER_PATH }}/fhir-ig-list.json 
+          -templates ${{ env.WEB_REPO_CONTAINER_PATH }}/ig/templates
 
-      # - name: Remove unnecessary files
-      #   shell: bash
-      #   run: |
-      #     rm --recursive --force --verbose ${{ env.WEB_REPO_CONTAINER_PATH }}/ig/ig-build-zips
+      - name: Remove unnecessary files
+        shell: bash
+        run: |
+          rm --recursive --force --verbose ${{ env.WEB_REPO_CONTAINER_PATH }}/ig/ig-build-zips
 
-      # - name: Update IG registry
-      #   shell: bash
-      #   run: |
-      #     export DESCRIPTION=$(yq -r .description ${{ env.IG_CONTAINER_PATH }}/sushi-config.yaml)
-      #     export AUTHORITY=$(yq -r .publisher.name ${{ env.IG_CONTAINER_PATH }}/sushi-config.yaml)
-      #     echo $DESCRIPTION
-      #     echo $AUTHORITY
-      #     echo "$(jq '
-      #       .guides[-1].description = env.DESCRIPTION |
-      #       .guides[-1].authority = env.AUTHORITY |
-      #       .guides[-1].country = "dk"
-      #     ' ${{ env.REGISTRY_REPO_CONTAINER_PATH }}/fhir-ig-list.json)" > ${{ env.REGISTRY_REPO_CONTAINER_PATH }}/fhir-ig-list.json
+      - name: Update IG registry
+        shell: bash
+        run: |
+          export DESCRIPTION=$(yq -r .description ${{ env.IG_CONTAINER_PATH }}/sushi-config.yaml)
+          export AUTHORITY=$(yq -r .publisher.name ${{ env.IG_CONTAINER_PATH }}/sushi-config.yaml)
+          echo $DESCRIPTION
+          echo $AUTHORITY
+          echo "$(jq '
+            .guides[-1].description = env.DESCRIPTION |
+            .guides[-1].authority = env.AUTHORITY |
+            .guides[-1].country = "dk"
+          ' ${{ env.REGISTRY_REPO_CONTAINER_PATH }}/fhir-ig-list.json)" > ${{ env.REGISTRY_REPO_CONTAINER_PATH }}/fhir-ig-list.json
 
-      # - name: Show new publication IG publication registration entry
-      #   shell: bash
-      #   run: |
-      #     echo "$(jq '.guides[-1]' ${{ env.REGISTRY_REPO_CONTAINER_PATH }}/fhir-ig-list.json)"
+      - name: Show new publication IG publication registration entry
+        shell: bash
+        run: |
+          echo "$(jq '.guides[-1]' ${{ env.REGISTRY_REPO_CONTAINER_PATH }}/fhir-ig-list.json)"
 
       # ─────── 🛠️ Commit & PR ───────
       - name: Configure Git
@@ -156,31 +156,31 @@ jobs:
           git config --global user.name "${{ env.APP_AUTHOR_NAME }}"
           git config --global user.email "${{ env.APP_AUTHOR_EMAIL }}"
 
-      - name: Show Web repo git status files
-        shell: bash
-        run: |
-          echo "\n test" > ${{ env.REGISTRY_REPO_CONTAINER_PATH }}/fhir-ig-list.json
-          git -C ${{ env.REGISTRY_REPO_CONTAINER_PATH }} status
-
-      # - name: Commit changes in website repo
-      #   working-directory: ${{ env.WEB_REPO_CONTAINER_PATH }}
-      #   run: |
-      #     git checkout -b publish-${{ env.IG_NAME }}-${{ env.RELEASE_VERSION }}
-      #     git add ig
-      #     git commit -m "chore: publish IG ${{ env.RELEASE_VERSION }}" || echo "Error - No changes to commit"
-
-      - name: Create Pull Request
+      - name: Create Pull Request For Web Repo
         uses: peter-evans/create-pull-request@v4
         with:
           token: ${{ steps.token.outputs.token }}
           commit-message: "chore: publish IG ${{ env.RELEASE_VERSION }}"
-          branch: "publish-${{ env.IG_NAME }}-${{ env.RELEASE_VERSION }}"
+          branch: "publish-${{ env.IG_NAME }}-${{ env.RELEASE_VERSION }}-${{ github.run_number }}"
           title: "Publish IG ${{ env.RELEASE_VERSION }}"
           body: |
             This PR was automatically generated by the MedCom document publish workflow.
             It contains the transpiled IG output for version ${{ env.RELEASE_VERSION }}.
+          base: main
+          path: ${{ env.WEB_REPO_CONTAINER_PATH }}
+
+      - name: Create Pull Request For FHIR IG Registry
+        uses: peter-evans/create-pull-request@v4
+        with:
+          token: ${{ steps.token.outputs.token }}
+          commit-message: "chore: update ig registry for ${{ env.IG_NAME }} - ${{ env.RELEASE_VERSION }}"
+          branch: "${{ env.IG_NAME }}-${{ env.RELEASE_VERSION }}-${{ github.run_number }}"
+          title: "Update IG Registry for ${{ env.IG_NAME }} - ${{ env.RELEASE_VERSION }}"
+          body: |
+            This PR was automatically generated by the MedCom document publish workflow.
+            It contains the updated IG registry json file for ${{ env.IG_NAME }} version ${{ env.RELEASE_VERSION }}.
           base: master
-          path: ${{ env.REGISTRY_REPO_CONTAINER_PATH }}
+          path: ${{ env.REGISTRY_REPO_CONTAINER_PATH  }}
 
       # TODO: Consider if it would be worth to have a temporary github pages that displays the new version of your publish
       # so that people can double check it before actually publishing it
