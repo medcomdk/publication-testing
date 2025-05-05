@@ -65,11 +65,19 @@ jobs:
           cat ${{ env.IG_CONTAINER_PATH }}/sushi-config.yaml
           echo -n "\n\n======================== publication-request.json ========================\n"
           cat ${{ env.IG_CONTAINER_PATH }}/publication-request.json
+          echo ${{ vars.FHIR_PUBLICATION_BOT_APP_ID }}
+          len=$(echo -n "${{ secrets.PUBLISHER_APP_PRIVATE_KEY }}" | wc -c)
+          echo "PUBLISHER_APP_PRIVATE_KEY is $len characters long"
+          # Get the first character
+          first_char=$(echo -n "${{ secrets.PUBLISHER_APP_PRIVATE_KEY }}" | head -c1)
+          # Print it – this single character will NOT be redacted
+          echo "First character of secret is: '$first_char'"
 
-      - name: Transpile to prepare for publication
-        shell: bash
-        working-directory: ${{ env.IG_CONTAINER_PATH }}
-        run: java -jar /input-cache/publisher.jar .
+      # TODO Uncomment
+      # - name: Transpile to prepare for publication
+      #   shell: bash
+      #   working-directory: ${{ env.IG_CONTAINER_PATH }}
+      #   run: java -jar /input-cache/publisher.jar .
 
       - name: Generate app token
         id: token
