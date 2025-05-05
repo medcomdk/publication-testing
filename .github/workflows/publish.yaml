@@ -65,6 +65,9 @@ jobs:
           echo -n "\n\n======================== publication-request.json ========================\n"
           cat ${{ env.IG_CONTAINER_PATH }}/publication-request.json
 
+      - name: Install the latest SUSHI
+        run: npm install -g fsh-sushi
+
       - name: Transpile to prepare for publication
         shell: bash
         working-directory: ${{ env.IG_CONTAINER_PATH }}
@@ -148,6 +151,11 @@ jobs:
           echo "$(jq '.guides[-1]' ${{ env.REGISTRY_REPO_CONTAINER_PATH }}/fhir-ig-list.json)"
 
       # ─────── 🛠️ Commit & PR ───────
+      - name: Configure Git
+        run: |
+          git config --global user.name "${{ env.APP_AUTHOR_NAME }}"
+          git config --global user.email "${{ env.APP_AUTHOR_EMAIL }}"
+
       - name: Show Web repo git status files
         shell: bash
         run: |
