@@ -2,10 +2,8 @@ name: MedCom document publish job
 
 on:
   push:
-  # TODO: Uncomment this tags
-  # TODO: Remove the Oliver publication bot
-    # tags:
-      # - 'v.[0-9]+.[0-9]+.[0-9]+'   # Only runs on semantic tags (v.1.2.3)
+    tags:
+      - 'v.[0-9]+.[0-9]+.[0-9]+'   # Only runs on semantic tags (v.1.2.3)
 
 env:
   IG_CONTAINER_PATH: "ig"
@@ -181,6 +179,3 @@ jobs:
             It contains the updated IG registry json file for ${{ env.IG_NAME }} version ${{ env.RELEASE_VERSION }}.
           base: master
           path: ${{ env.REGISTRY_REPO_CONTAINER_PATH  }}
-
-      # TODO: Consider if it would be worth to have a temporary github pages that displays the new version of your publish
-      # so that people can double check it before actually publishing it
